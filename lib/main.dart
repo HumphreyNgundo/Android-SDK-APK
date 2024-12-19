@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'EligibilityCheckCard.dart';
 import 'device_info_bridge.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -34,7 +35,6 @@ class _MyHomePageState extends State<MyHomePage> {
       Permission.phone,
     ].request();
 
-    // Log the status of permissions
     statuses.forEach((permission, status) {
       print('$permission: $status');
     });
@@ -58,70 +58,78 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text('Device Info App'),
         backgroundColor: Colors.blue,
       ),
-      body: Center(
+      // Wrap the body in SingleChildScrollView and add EligibilityCheckCard
+      body: SingleChildScrollView(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-                padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
-              ),
-              onPressed: () async {
-                // Check permissions before logging
-                bool hasPermissions = await Permission.contacts.isGranted &&
-                    await Permission.sms.isGranted &&
-                    await Permission.phone.isGranted;
-
-                if (hasPermissions) {
-                  await DeviceInfoBridge.logData();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Data logged successfully'),
-                      backgroundColor: Colors.green,
+            // Add the eligibility card at the top
+            EligibilityCheckCard(),
+            // Existing buttons wrapped in a Center widget
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
                     ),
-                  );
-                } else {
-                  // Show permission request dialog
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: Text('Permissions Required'),
-                        content: Text('This app needs contacts, SMS, and phone permissions to function properly.'),
-                        actions: [
-                          TextButton(
-                            child: Text('Cancel'),
-                            onPressed: () => Navigator.pop(context),
+                    onPressed: () async {
+                      bool hasPermissions = await Permission.contacts.isGranted &&
+                          await Permission.sms.isGranted &&
+                          await Permission.phone.isGranted;
+
+                      if (hasPermissions) {
+                        await DeviceInfoBridge.logData();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Data logged successfully'),
+                            backgroundColor: Colors.green,
                           ),
-                          TextButton(
-                            child: Text('Request Permissions'),
-                            onPressed: () {
-                              Navigator.pop(context);
-                              _requestPermissions();
-                            },
-                          ),
-                        ],
-                      );
+                        );
+                      } else {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text('Permissions Required'),
+                              content: Text('This app needs contacts, SMS, and phone permissions to function properly.'),
+                              actions: [
+                                TextButton(
+                                  child: Text('Cancel'),
+                                  onPressed: () => Navigator.pop(context),
+                                ),
+                                TextButton(
+                                  child: Text('Request Permissions'),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                    _requestPermissions();
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      }
                     },
-                  );
-                }
-              },
-              child: Text(
-                'Log Device Data',
-                style: TextStyle(fontSize: 18),
-              ),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.grey,
-                padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
-              ),
-              onPressed: _requestPermissions,
-              child: Text(
-                'Request Permissions',
-                style: TextStyle(fontSize: 18),
+                    child: Text(
+                      'Log Device Data',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey,
+                      padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                    ),
+                    onPressed: _requestPermissions,
+                    child: Text(
+                      'Request Permissions',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
