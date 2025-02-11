@@ -48,7 +48,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _initializeSDK() async {
-    await DeviceInfoBridge.initializeSDK('http://10.10.0.130:8083/nic_sasa_api/api/log');
+    await DeviceInfoBridge.initializeSDK('http://10.10.0.93:8083/nic_sasa_api/api/log');
   }
 
   @override

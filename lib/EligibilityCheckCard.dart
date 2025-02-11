@@ -26,7 +26,7 @@ class _EligibilityCheckCardState extends State<EligibilityCheckCard> {
 
     try {
       final response = await http.get(
-        Uri.parse('http://10.10.0.100:8097/data-processor-microservice/api/loan/limit/254794410646'),
+        Uri.parse('http://10.10.0.93:8097/data-processor-microservice/api/loan/limit/254794410646'),
         headers: {'Content-Type': 'application/json'},
       );
 
